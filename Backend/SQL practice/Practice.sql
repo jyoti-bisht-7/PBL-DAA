@@ -106,6 +106,7 @@ SELECT * FROM customers ORDER BY points DESC LIMIT 3; -- LIMIT always at end
 -- INNER JOIN
 SELECT order_id, first_name FROM orders 
 JOIN customers ON orders.customer_id =customers.customer_id;
+
 /*SELECT order_id,customer_id, first_name FROM orders 
 JOIN customers ON orders.customer_id =customers.customer_id; -- ambiguity on customer_id */
 SELECT order_id,orders.customer_id, first_name FROM orders 
@@ -116,4 +117,59 @@ JOIN customers c ON o.customer_id =c.customer_id; -- using alias
 -- practice
 SELECT order_id,p.product_id,name,o.quantity,o.unit_price FROM order_items o JOIN products p ON o.product_id=p.product_id;
 
+-- JOIN DATABASES
+SELECT * FROM order_items oi 
+JOIN sql_inventory.products p ON oi.product_id=p.product_id; 
 
+-- SELF JOINS (explicit)
+USE sql_hr;
+SELECT e.employee_id,e.first_name ,m.first_name AS 'MANAGER' FROM employees e 
+JOIN employees m ON e.reports_to=m.employee_id;
+
+-- JOIN MULTIPLE TABLES
+
+SELECT o.order_id,o.order_date,c.first_name,c.last_name,os.name AS 'status' FROM orders o 
+JOIN customers c ON o.customer_id =c.customer_id 
+JOIN order_statuses os ON o.status=os.order_status_id;
+
+-- practice
+USE invoicing;
+SELECT c.client_id,c.name,pm.name AS 'payment method name'FROM clients c 
+JOIN payments p on p.client_id=c.client_id 
+JOIN payment_methods pm on pm.payment_method_id=p.payment_method;
+
+-- COMPOUND JOIN COMBINATIONS (two primary keys)
+SELECT * FROM order_items oi
+JOIN order_item_notes oin 
+ON oi.order_id=oin.order_id 
+AND oi.product_id=oin.product_id;
+
+-- implicit join syntax
+SELECT * FROM orders o,customers c WHERE o.customer_id =c.customer_id;
+
+-- outer joins (outer keyword is optional)
+-- left join all records from left table are returned
+-- right join all records from right table are returned
+
+SELECT c.customer_id,c.first_name,o.order_id FROM customers c 
+LEFT JOIN orders o ON c.customer_id=o.customer_id ORDER BY c.customer_id;
+
+SELECT c.customer_id,c.first_name,o.order_id FROM customers c 
+RIGHT JOIN orders o ON c.customer_id=o.customer_id ORDER BY c.customer_id;
+
+--practice
+SELECT p.product_id,p.name,oi.quantity FROM products p
+LEFT JOIN order_items oi ON p.product_id=oi.product_id;
+
+ -- OUTER JOINS BETWEEN MULTIPLE TABLES
+ SELECT c.customer_id,c.first_name,o.order_id,sh.name as 'shipper' FROM customers c
+ LEFT JOIN orders o ON c.customer_id=o.customer_id
+ LEFT JOIN shippers sh ON o.shipper_id=sh.shipper_id
+ ORDER BY c.customer_id;
+ 
+ -- practice
+ SELECT o.order_date,o.order_id,c.first_name,sh.name as 'shipper' ,os.name as'status'  FROM orders o
+ JOIN customers c ON o.customer_id=c.customer_id 
+ LEFT JOIN shippers sh ON o.shipper_id=sh.shipper_id
+ JOIN order_statuses os ON os.order_status_id=o.status;
+ 
