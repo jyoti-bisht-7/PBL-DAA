@@ -172,4 +172,99 @@ LEFT JOIN order_items oi ON p.product_id=oi.product_id;
  JOIN customers c ON o.customer_id=c.customer_id 
  LEFT JOIN shippers sh ON o.shipper_id=sh.shipper_id
  JOIN order_statuses os ON os.order_status_id=o.status;
+
+
+ -- SELF OUTER JOINS
+  USE sql_hr;
+ SELECT e.employee_id, e.first_name,e.first_name AS manager FROM employees e
+ LEFT JOIN employees m ON e.reports_to =m.employee_id;
+ 
+ -- USING CLAUSE
+ -- while joining table if the column on which we are joining is same then we can use using clause instead of ON
+ SELECT o.order_id,c.first_name,sh.name AS SHIPPER FROM orders o
+ JOIN customers c USING (customer_id)
+ LEFT JOIN shippers sh USING (shipper_id);
+ 
+ SELECT * FROM order_items oi 
+ JOIN order_item_notes oin USING (order_id,product_id);
+ 
+ -- practice
+ USE invoicing;
+ SELECT p.date ,c.name AS client,p.amount,pm.name AS name FROM clients c
+ JOIN payments p USING  (client_id) 
+ JOIN payment_methods pm ON p.payment_method=pm.payment_method_id;
+ 
+ -- NATURAL JOINS (not recommended)
+ SELECT o.order_id ,c.first_name  FROM orders  o
+ NATURAL JOIN customers c;  
+ 
+ -- CROSS JOINS (to join every record from first table with second table)
+ SELECT c.first_name AS customer,p.name AS product FROM customers c
+ CROSS JOIN products p ORDER BY c.first_name; -- explicit syntax
+ 
+ -- CROSS JOIN (implicit syntax)
+ SELECT c.first_name AS customer,p.name AS product 
+ FROM customers c,products p ORDER BY c.first_name;
+ 
+ -- practice
+ SELECT * FROM shippers,products ;
+ SELECT * FROM shippers CROSS JOIN products;
+ 
+ -- UNIONS (Combinig rows)
+ 
+SELECT order_id,order_date ,'ACTIVE' AS status FROM orders WHERE order_date>='2019-01-01'
+UNION
+SELECT order_id,order_date ,'Archived' AS status FROM orders WHERE order_date<'2019-01-01';
+
+-- different tables
+SELECT first_name FROM customers UNION SELECT name FROM shippers;
+SELECT name FROM shippers UNION SELECT first_name FROM customers;
+-- no. of coloumns from each query must be equal
+-- SELECT first_name,last_name FROM customers UNION SELECT NAME FROM shippers;
+
+-- practice
+SELECT customer_id ,first_name ,points,'Bronze'AS type FROM customers WHERE points<2000
+UNION
+SELECT customer_id,first_name,points,'Silver' AS type FROM customers WHERE points>=2000 AND points<3000
+UNION 
+SELECT customer_id,first_name,points,'Gold' AS type FROM customers WHERE points>=3000 ORDER BY first_name;
+
+-- INSERT CLAUSE
+ -- INSERTING A ROW
+ INSERT INTO customers VALUES (
+ DEFAULT,
+ 'John',
+ 'Smith',
+ '1990-01-01',
+ NULL,
+ 'address',
+ 'city',
+ 'CA',
+ DEFAULT);
+ 
+-- INSERTING specific values (order need not be same)
+ INSERT INTO customers (first_name,last_name,birth_date,address,city,state)
+ VALUES (
+ 'John',
+ 'Smith',
+ '1990-01-01',
+ 'address',
+ 'city',
+ 'CA');
+ 
+ -- INSERTING MULTIPLE COLUMNS
+ INSERT INTO shippers (name)
+ VALUES('Shipper 1'),
+		     ('Shipper 2'),
+       ('Shipper 3');
+ -- practice
+ INSERT INTO products (name,quantity_in_stock,unit_price) 
+ VALUES ('Jyoti',2,1.5),
+		      ('Lakshita',3,2.5),
+        ('Bhavesh',4,3.5);
+
+
+
+ 
+
  
