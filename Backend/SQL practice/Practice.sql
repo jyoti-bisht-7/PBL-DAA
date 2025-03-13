@@ -262,6 +262,72 @@ SELECT customer_id,first_name,points,'Gold' AS type FROM customers WHERE points>
  VALUES ('Jyoti',2,1.5),
 		      ('Lakshita',3,2.5),
         ('Bhavesh',4,3.5);
+-- INSERTING HIERARCHICAL ROWS (inserting data in multiples)
+INSERT INTO orders (customer_id,order_date,status) 
+VALUES (1,'2019-01-02',1);
+INSERT INTO order_items VALUES (LAST_INSERT_ID(),1,1,2.95),
+							   (LAST_INSERT_ID(),2,1,3.98);
+
+-- CREATING COPY OF TABLE
+CREATE TABLE orders_archived AS 
+SELECT * FROM orders; -- subquery
+
+-- using subqueries to insert data
+INSERT INTO orders_archived
+SELECT * FROM orders WHERE order_date<'2019-01-01';
+
+-- practice
+USE invoicing;
+
+CREATE TABLE invoices_archived AS 
+SELECT i.invoice_id,i.number,c.name,i.invoice_total,i.payment_total,i.invoice_date,i.due_date,i.payment_date 
+FROM invoices i
+JOIN clients c USING (client_id) WHERE i.payment_date IS NOT NULL;
+
+ 
+ 
+ -- UPDATING A SINGLE ROW
+ USE invoicing;
+ 
+ UPDATE invoices SET payment_total=10,payment_date='2019-03-01' 
+ WHERE invoice_id=1;
+ 
+ USE invoicing;
+ UPDATE invoices SET payment_total=invoice_total*0.5 ,
+ payment_date=due_date
+ WHERE invoice_id=3;
+ 
+ -- UPDATING MULTIPLE ROWS
+ USE invoicing;
+ UPDATE invoices SET payment_total=invoice_total*0.5 ,
+ payment_date=due_date 
+ WHERE client_id IN (3,4);
+ 
+ -- practice
+UPDATE customers SET points =points+50 
+WHERE birth_date<'1990-01-01';
+ 
+ 
+ -- USing subqueries in UPDATE
+ USE invoicing;
+ UPDATE invoices SET payment_total=invoice_total*0.5 ,
+ payment_date=due_date 
+ WHERE client_id=(SELECT client_id FROM clients WHERE name='Myworks');
+ 
+ UPDATE invoices SET payment_total=invoice_total*0.5 ,
+ payment_date=due_date 
+ WHERE client_id IN (SELECT client_id FROM clients WHERE state IN ('CA','NY'));
+ 
+ -- practice
+ UPDATE orders SET comments='GOLD' 
+ WHERE customer_id IN (
+ (SELECT customer_id FROM customers 
+ WHERE points>3000));
+ */
+ -- DELETING ROWS
+ USE invoicing;
+ DELETE FROM invoices WHERE client_id IN
+ ( SELECT client_id FROM clients WHERE name='Myworks');
 
 
 
