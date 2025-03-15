@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8"> <!-- Defines character encoding as Unicode Transformation Format-->
+        <meta name="viewport" content="width=device-width, initial -scale=1.0"> <!-- controls how webpage scales and adjusts to different screen sizes-->
+        <meta http-equiv="X-UA-Compatible" content="ie=edge"><!-- Tells internet explorer to use latest available rendering engine for compatibility-->
+        <link rel="stylesheet" href="{{ url_for('static',filename='css/main.css') }}">  <!-- url_for is a Jinja2 function that generates correct URL for static file-->
+        <!-- ensures it's properly served even if the app's URL structure changes-->
+        {% block head %}{% endblock %} <!-- Jinja2 block used for templating in Flask -->
+        <!-- child templates can override this block to insert their own content-->
+    </head>
+    <body>
+        {% block body %}{% endblock %}
+    </body>
+</html>
